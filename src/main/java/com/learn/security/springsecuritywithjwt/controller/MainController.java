@@ -1,14 +1,19 @@
 package com.learn.security.springsecuritywithjwt.controller;
 
+import com.learn.security.springsecuritywithjwt.exception.IncorrectUsernameOrPasswordException;
+import com.learn.security.springsecuritywithjwt.exception.UserNotFoundException;
 import com.learn.security.springsecuritywithjwt.pojo.LoginRequest;
 import com.learn.security.springsecuritywithjwt.service.JwtUtilService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Slf4j
 public class MainController {
 
     private final JwtUtilService jwtUtilService;
@@ -20,16 +25,19 @@ public class MainController {
     }
 
     @PostMapping("/login")
-    public String generateToken(@RequestBody LoginRequest authorizeReq) throws Exception {
+    public String generateToken(@RequestBody LoginRequest authorizeReq) {
         try {
-            System.out.println("Trying to authentication");
-            authenticationManager.authenticate(
+            log.info("Trying to authentication");
+            Authentication authenticate = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authorizeReq.getUsername(), authorizeReq.getPassword())
             );
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new Exception("Invalid username/password");
+            if (!authenticate.isAuthenticated()) {
+                throw new IncorrectUsernameOrPasswordException("Incorrect username or password");
+            }
+            return jwtUtilService.generateToken(authorizeReq.getUsername());
+        } catch (UserNotFoundException e) {
+            log.error("Invalid username/password");
+            return null;
         }
-        return jwtUtilService.generateToken(authorizeReq.getUsername());
     }
 }
