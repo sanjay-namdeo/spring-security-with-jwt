@@ -1,14 +1,11 @@
 package com.learn.security.springsecuritywithjwt.filter;
 
-import com.learn.security.springsecuritywithjwt.exception.InvalidJWTException;
-import com.learn.security.springsecuritywithjwt.exception.UserNotFoundException;
 import com.learn.security.springsecuritywithjwt.service.JwtUtilService;
 import com.learn.security.springsecuritywithjwt.service.UserDetailServiceImpl;
-import org.springframework.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -20,9 +17,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
+@Slf4j
 public class JwtFilter extends OncePerRequestFilter {
     public JwtUtilService jwtUtilService;
     public UserDetailServiceImpl userDetailService;
+    private final static String authorizationHeader = "Authorization";
+    private final static String tokenPrefix = "Bearer";
 
     public JwtFilter(JwtUtilService jwtUtilService, UserDetailServiceImpl userDetailService) {
         this.jwtUtilService = jwtUtilService;
@@ -31,29 +31,24 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String authorization = request.getHeader("Authorization");
-        String token = null;
-        String username = null;
+        String authorization = request.getHeader(authorizationHeader);
 
-        if (authorization != null && authorization.startsWith("Bearer")) {
-            token = authorization.substring(7);
-            username = jwtUtilService.extractUsername(token);
-        }
+        if (authorization != null && authorization.startsWith(tokenPrefix)) {
+            String token = authorization.substring(7);
+            String username = jwtUtilService.extractUsername(token);
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailService.loadUserByUsername(username);
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userDetailService.loadUserByUsername(username);
 
-            if (userDetails == null) {
-                throw new UserNotFoundException("User has not signed up!");
+                if (jwtUtilService.validateToken(token, userDetails)) {
+                    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                }
             }
-
-            if (jwtUtilService.validateToken(token, userDetails)) {
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-            } else {
-                throw new InvalidJWTException(HttpStatus.BAD_REQUEST);
-            }
+        } else {
+            log.warn("JWT not found OR invalid!");
+            SecurityContextHolder.clearContext();
         }
 
         filterChain.doFilter(request, response);
