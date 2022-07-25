@@ -20,7 +20,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private final UserDetailServiceImpl userDetailService;
     private final JwtFilter jwtFilter;
-    AuthenticationManager authenticationManager;
 
     public SecurityConfig(UserDetailServiceImpl userDetailService, JwtFilter jwtFilter) {
         this.userDetailService = userDetailService;
@@ -30,8 +29,9 @@ public class SecurityConfig {
     @Bean
     protected SecurityFilterChain configureAuthorization(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
+        // Inject custom UserDetailService to authenticate user against database
         authenticationManagerBuilder.userDetailsService(userDetailService);
-        authenticationManager = authenticationManagerBuilder.build();
+        AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
 
         http.csrf().disable()
                 .authorizeRequests()
@@ -46,6 +46,7 @@ public class SecurityConfig {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
+        // Inject JWT filter
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
