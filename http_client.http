@@ -1,9 +1,18 @@
 ###
-POST http://localhost:9000/login
+POST http://localhost:8080/login
 Content-Type: application/json
 Accept: application/json
 
 {
 "username": "sanjay",
-"password": "12345544"
+"password": "12345"
 }
+> {%
+    client.global.set("auth_token", response.body);
+%}
+
+###
+GET http://localhost:8080/hello?name=SpringSecurity
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{auth_token}}
