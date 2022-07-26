@@ -4,7 +4,7 @@ Content-Type: application/json
 Accept: application/json
 
 {
-"username": "sanjay",
+"username": "sanjaynamdeo",
 "password": "12345"
 }
 > {%
@@ -16,3 +16,16 @@ GET http://localhost:8080/hello?name=SpringSecurity
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{auth_token}}
+
+###
+POST http://localhost:8080/signup
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Sanjay Namdeo",
+  "mobile": "1234567890",
+  "email": "test@test.com",
+  "username": "sanjaynamdeo",
+  "password": "12345"
+}
