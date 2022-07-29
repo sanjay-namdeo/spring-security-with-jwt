@@ -5,6 +5,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 public class IncorrectUsernameOrPasswordException extends ResponseStatusException {
     public IncorrectUsernameOrPasswordException(String message) {
-        super(HttpStatus.BAD_REQUEST, message);
+        super(HttpStatus.UNAUTHORIZED, message);
     }
 }

@@ -1,11 +1,11 @@
 package com.learn.security.springsecuritywithjwt.advice;
 
+import com.learn.security.springsecuritywithjwt.exception.IncorrectUsernameOrPasswordException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -20,5 +20,10 @@ public class MainExceptionHandler extends ResponseEntityExceptionHandler {
         Map<String, String> errorMap = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(fieldError -> errorMap.put(fieldError.getField(), fieldError.getDefaultMessage()));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMap);
+    }
+
+    @ExceptionHandler(value = {IncorrectUsernameOrPasswordException.class})
+    public ResponseEntity<Object> handleUnAuthorizedException() {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect username or password!");
     }
 }
