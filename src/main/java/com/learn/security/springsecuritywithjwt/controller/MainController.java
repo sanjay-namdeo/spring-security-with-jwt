@@ -1,8 +1,8 @@
 package com.learn.security.springsecuritywithjwt.controller;
 
 import com.learn.security.springsecuritywithjwt.exception.IncorrectUsernameOrPasswordException;
-import com.learn.security.springsecuritywithjwt.exception.UserNotFoundException;
 import com.learn.security.springsecuritywithjwt.pojo.LoginRequest;
+import com.learn.security.springsecuritywithjwt.pojo.LoginResponse;
 import com.learn.security.springsecuritywithjwt.pojo.SignupRequest;
 import com.learn.security.springsecuritywithjwt.pojo.SignupResponse;
 import com.learn.security.springsecuritywithjwt.service.JwtUtilService;
@@ -33,7 +33,7 @@ public class MainController {
     }
 
     @PostMapping("/login")
-    public String generateToken(@RequestBody LoginRequest authorizeReq) {
+    public ResponseEntity<LoginResponse> generateToken(@RequestBody LoginRequest authorizeReq) {
         try {
             log.info("Trying to authentication");
             Authentication authenticate = authenticationManager.authenticate(
@@ -42,7 +42,7 @@ public class MainController {
             if (!authenticate.isAuthenticated()) {
                 throw new IncorrectUsernameOrPasswordException("Incorrect username or password");
             }
-            return jwtUtilService.generateToken(authorizeReq.getUsername());
+            return ResponseEntity.status(HttpStatus.OK).body(new LoginResponse(jwtUtilService.generateToken(authorizeReq.getUsername())));
         } catch (BadCredentialsException e) {
             throw new IncorrectUsernameOrPasswordException("Incorrect username/password");
         }

@@ -4,12 +4,11 @@ Content-Type: application/json
 Accept: application/json
 
 {
-"username": "sanjaynamdeo",
-"password": "12345"
+  "username": "sanjay",
+  "password": "12345"
 }
-> {%
-    client.global.set("auth_token", response.body);
-%}
+
+> {% client.global.set("auth_token", response.body) %}
 
 ###
 GET http://localhost:8080/hello?name=SpringSecurity
@@ -17,13 +16,19 @@ Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{auth_token}}
 
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+        client.assert(response.body === 'Hello SpringSecurity', "Response is incorrect");
+    });
+%}
 ###
 POST http://localhost:8080/signup
 Content-Type: application/json
 Accept: application/json
 
 {
-  "name": "Sanjay Namdeo",
+  "name": "",
   "mobile": "1234567890",
   "email": "test@test.com",
   "username": "sanjaynamdeo",
