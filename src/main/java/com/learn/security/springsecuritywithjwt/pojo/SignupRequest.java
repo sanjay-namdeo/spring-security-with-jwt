@@ -17,7 +17,8 @@ public class SignupRequest {
     @NotBlank(message = "Please enter a valid phone number")
     @Pattern(regexp = "^\\d{10}$", message = "Please enter a valid phone number")
     private String mobile;
-    @Email(message = "Please enter a valid email address!")
+    @NotBlank(message = "Please enter a valid email address")
+    @Email(message = "Please enter a valid email address")
     private String email;
     @NotBlank(message = "Please enter a username")
     private String username;
