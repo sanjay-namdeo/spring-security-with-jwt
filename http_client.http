@@ -8,10 +8,10 @@ Accept: application/json
   "password": "12345"
 }
 
-> {% client.global.set("auth_token", response.body) %}
+> {% client.global.set("auth_token", response.body.token) %}
 
 ###
-GET http://localhost:8080/hello?name=SpringSecurity
+GET http://localhost:8080/hello?name=Spring Security with JWT
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{auth_token}}
