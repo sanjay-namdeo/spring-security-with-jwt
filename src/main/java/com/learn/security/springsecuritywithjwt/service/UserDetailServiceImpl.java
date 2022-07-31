@@ -33,8 +33,13 @@ public class UserDetailServiceImpl implements UserDetailsService {
     }
 
     public SignupResponse saveUser(SignupRequest signupRequest) {
-        UserEntity userEntity = new UserEntity(signupRequest.getUsername(), passwordEncoder.encode(signupRequest.getPassword()), signupRequest.getEmail(), signupRequest.getName(), signupRequest.getMobile());
-        UserEntity savedUser = this.userRepository.save(userEntity);
-        return SignupResponse.build(savedUser.getName(), savedUser.getUsername(), savedUser.getEmail(), savedUser.getMobile());
+        Optional<UserEntity> user = this.userRepository.findByUsername(signupRequest.getUsername());
+        if (user.isEmpty()) {
+            UserEntity userEntity = new UserEntity(signupRequest.getUsername(), passwordEncoder.encode(signupRequest.getPassword()), signupRequest.getEmail(), signupRequest.getName(), signupRequest.getMobile());
+            UserEntity savedUser = this.userRepository.save(userEntity);
+            return SignupResponse.build(savedUser.getName(), savedUser.getUsername(), savedUser.getEmail(), savedUser.getMobile());
+        } else {
+            return null;
+        }
     }
 }
