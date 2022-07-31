@@ -20,7 +20,7 @@ public class SpringSecurityWithJwtApplication {
     public void UserInit() {
         // String username, String password, String email, String name, String mobile
         List<UserEntity> users = Stream.of(
-                new UserEntity("sanjay", "$2a$10$saIsJjjY.wZTFJeh2z/A4.4EN5.8UjXYT4/rCr3TXBW8A4yid6Eum", "test@test.com", "Sanjay", "1234567")
+                new UserEntity("sanjaynamdeo", "$2a$10$saIsJjjY.wZTFJeh2z/A4.4EN5.8UjXYT4/rCr3TXBW8A4yid6Eum", "test@test.com", "Sanjay", "1234567")
         ).collect(Collectors.toList());
 
         userRepository.saveAll(users);
