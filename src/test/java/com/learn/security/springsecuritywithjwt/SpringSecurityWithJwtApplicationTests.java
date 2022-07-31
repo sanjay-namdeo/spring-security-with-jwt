@@ -79,7 +79,7 @@ class SpringSecurityWithJwtApplicationTests {
     }
 
     @Test
-    @DisplayName("Test /login with incorrect details")
+    @DisplayName("Test /login with invalid password")
     @Order(4)
     void Should_NotReturnJWTToken_When_InCorrectCredentialsProvided() {
         WebTestClient.bindToServer().baseUrl("http://localhost:" + port).build().post().uri("/login")
@@ -131,5 +131,40 @@ class SpringSecurityWithJwtApplicationTests {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isForbidden();
+    }
+
+    @Test
+    @DisplayName("Test /signup should not signup a duplicate user")
+    @Order(7)
+    void Should_NotSignup_DuplicateUser_WhenSigningUp() {
+        SignupRequest signupRequest = SignupRequest.build("Sanjay Namdeo", "1234567890", "test@test.com", "sanjay", "12345");
+
+        WebTestClient.bindToServer().baseUrl("http://localhost:" + port)
+                .build()
+                .post()
+                .uri("/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .body(Mono.just(signupRequest), SignupRequest.class)
+                .exchange()
+                .expectStatus().isUnauthorized()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.message").isEqualTo("401 UNAUTHORIZED \"User already exist\"");
+    }
+
+    @Test
+    @DisplayName("Test /login when user has not signed up")
+    @Order(8)
+    void Should_NotLogin_NewUser_WhenNotSignedUp() {
+        WebTestClient.bindToServer().baseUrl("http://localhost:" + port).build().post().uri("/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .body(Mono.just(new LoginRequest("namdeo", "12345")), LoginRequest.class)
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.message").isEqualTo("404 NOT_FOUND \"User not found\"");
     }
 }

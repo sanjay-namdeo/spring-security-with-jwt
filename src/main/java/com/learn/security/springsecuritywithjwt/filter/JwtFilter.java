@@ -1,9 +1,7 @@
 package com.learn.security.springsecuritywithjwt.filter;
 
-import com.learn.security.springsecuritywithjwt.exception.InvalidJWTException;
 import com.learn.security.springsecuritywithjwt.service.JwtUtilService;
 import com.learn.security.springsecuritywithjwt.service.UserDetailServiceImpl;
-import io.jsonwebtoken.MalformedJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,21 +35,16 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (authorization != null && authorization.startsWith(tokenPrefix)) {
             String token = authorization.substring(7);
-            try {
-                String username = jwtUtilService.extractUsername(token);
+            String username = jwtUtilService.extractUsername(token);
 
-                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UserDetails userDetails = userDetailService.loadUserByUsername(username);
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userDetailService.loadUserByUsername(username);
 
-                    if (jwtUtilService.validateToken(token, userDetails)) {
-                        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                        usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-                    }
+                if (jwtUtilService.validateToken(token, userDetails)) {
+                    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
                 }
-            } catch (MalformedJwtException exception) {
-                SecurityContextHolder.clearContext();
-                throw new InvalidJWTException("MalformedJwtException JWT Token");
             }
         } else {
             log.warn("JWT not found OR invalid!");

@@ -42,13 +42,8 @@ public class MainExceptionHandler extends ResponseEntityExceptionHandler {
         return buildErrorResponse(exception, exception.getStatus());
     }
 
-    @ExceptionHandler(value = {InvalidJWTException.class})
-    public ResponseEntity<Object> handleMalformedJwtException(InvalidJWTException exception) {
-        return buildErrorResponse(exception, HttpStatus.FORBIDDEN);
-    }
-
-    @ExceptionHandler(value = {ExpiredJWTException.class})
-    public ResponseEntity<Object> handleExpiredJWTException(ExpiredJWTException exception) {
-        return buildErrorResponse(exception, HttpStatus.FORBIDDEN);
+    @ExceptionHandler(value = {UserNotFoundException.class})
+    public ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException exception) {
+        return buildErrorResponse(exception, exception.getStatus());
     }
 }

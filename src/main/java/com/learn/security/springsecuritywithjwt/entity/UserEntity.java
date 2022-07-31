@@ -1,17 +1,13 @@
 package com.learn.security.springsecuritywithjwt.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import javax.persistence.*;
 
-@Data
-@ToString(callSuper = true)
 @NoArgsConstructor
-@AllArgsConstructor(staticName = "build")
 @Entity
+@Getter
 @Table(name = "USER_MASTER")
 public class UserEntity {
     @Id
