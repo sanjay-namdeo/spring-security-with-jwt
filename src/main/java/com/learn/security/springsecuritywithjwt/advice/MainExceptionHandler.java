@@ -1,13 +1,10 @@
 package com.learn.security.springsecuritywithjwt.advice;
 
-import com.learn.security.springsecuritywithjwt.exception.ErrorResponse;
-import com.learn.security.springsecuritywithjwt.exception.IncorrectUsernameOrPasswordException;
-import com.learn.security.springsecuritywithjwt.exception.UserAlreadyExistsException;
+import com.learn.security.springsecuritywithjwt.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -45,8 +42,13 @@ public class MainExceptionHandler extends ResponseEntityExceptionHandler {
         return buildErrorResponse(exception, exception.getStatus());
     }
 
-    @ExceptionHandler(InternalAuthenticationServiceException.class)
-    public ResponseEntity<Object> handleInternalAuthenticationServiceException(InternalAuthenticationServiceException exception) {
-        return buildErrorResponse(exception, HttpStatus.INTERNAL_SERVER_ERROR);
+    @ExceptionHandler(value = {InvalidJWTException.class})
+    public ResponseEntity<Object> handleMalformedJwtException(InvalidJWTException exception) {
+        return buildErrorResponse(exception, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(value = {ExpiredJWTException.class})
+    public ResponseEntity<Object> handleExpiredJWTException(ExpiredJWTException exception) {
+        return buildErrorResponse(exception, HttpStatus.FORBIDDEN);
     }
 }
