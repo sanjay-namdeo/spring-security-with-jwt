@@ -1,10 +1,22 @@
 ###
+POST http://localhost:8080/signup
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Sanjay Namdeo",
+  "mobile": "1234567890",
+  "email": "test@test.com",
+  "username": "sanjaynamdeo",
+  "password": "12345"
+}
+###
 POST http://localhost:8080/login
 Content-Type: application/json
 Accept: application/json
 
 {
-  "username": "sanjay",
+  "username": "sanjaynamdeo",
   "password": "12345"
 }
 
@@ -19,18 +31,6 @@ Authorization: Bearer {{auth_token}}
 > {%
     client.test("Request executed successfully", function() {
         client.assert(response.status === 200, "Response status is not 200");
-        client.assert(response.body === 'Hello SpringSecurity', "Response is incorrect");
+        client.assert(response.body === 'Hello Spring Security with JWT', "Response is incorrect");
     });
 %}
-###
-POST http://localhost:8080/signup
-Content-Type: application/json
-Accept: application/json
-
-{
-  "name": "Sanjay Namdeo",
-  "mobile": "1234567890",
-  "email": "test@test.com",
-  "username": "sanjaynamdeo",
-  "password": "12345"
-}
