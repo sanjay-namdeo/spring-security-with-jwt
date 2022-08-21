@@ -1,5 +1,5 @@
 ###
-POST http://localhost:8080/signup
+POST https://localhost:8080/signup
 Content-Type: application/json
 Accept: application/json
 
@@ -11,7 +11,7 @@ Accept: application/json
   "password": "12345"
 }
 ###
-POST http://localhost:8080/login
+POST https://localhost:8080/login
 Content-Type: application/json
 Accept: application/json
 
@@ -23,7 +23,7 @@ Accept: application/json
 > {% client.global.set("auth_token", response.body.token) %}
 
 ###
-GET http://localhost:8080/hello?name=Spring Security with JWT
+GET https://localhost:8080/hello?name=Spring Security with JWT
 Content-Type: application/json
 Accept: application/json
 Authorization: Bearer {{auth_token}}
